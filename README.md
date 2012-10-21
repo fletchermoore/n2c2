@@ -11,7 +11,7 @@ Use
 2. launch Anki
 3. within Anki, select `Tools -> Convert Open Document Notes...` and then choose your file.
 4. within Anki, select `File -> Import...` and then choose the newly created `-READY_FOR_ANKI.txt` file
-5. select the deck and then click `Import`
+5. select or create the destination deck and then click `Import` (an oddly positioned button in the bottom right quadrant of the dialog box)
 
 Tutorial
 ========
@@ -165,7 +165,7 @@ Notice I changed the text from `secondary` to `secondary hypertension`.
 Special Characters: "Reverse" <<
 --------------------------------
 
-Like the pipes `||`, put the double ankle brackets `<<` at the start of the line. This code tells the program to flip the
+Like the pipes `||`, put the double angle brackets `<<` at the start of the line. This code tells the program to flip the
 front and back of the card. Here is an example. Notice I am using the "start" code again as well to eliminate 
 excess verbosity.
 
@@ -205,7 +205,8 @@ Results
 > front: `secondary hypertension`
 > back: `hypertension caused by some other underlying condition`
 
-A word of caution: some word processors will replace the double ankle brackets with a single character.* If this 
+A word of caution: some word processors will replace the double angle brackets with a single character 
+(the left guillemet [aka French quotation marks]) If this 
 happens the "reverse" code will not be interpreted. Also, if you have subitems under a reversed card, the card will
 not reverse correctly. The reversed bullet must be a terminal leaf.
 
