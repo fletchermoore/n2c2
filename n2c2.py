@@ -1,9 +1,6 @@
 from zipfile import ZipFile, is_zipfile
 from lxml import etree
-import re
-
-#temp until command line stuff
-path = 'test.odt'
+import re, os
 
 # how much jank?
 def rreplace(text, old, new, count):
@@ -271,22 +268,22 @@ class NotesToCards():
 		num = len(uniqueBacks)
 		back = '<br/>'.join(uniqueBacks)
 		back = re.sub(r'{{.+?}}', '', back)
-		print 'back// ', back
+		#print 'back// ', back
 		
 		# any of the paths should do, since they should all start the same
 		frontPath = self.paths[indexes[0]][:backIndex]
 		front = self.makeFront(frontPath)
 		if num > 1:
 			front += ' (%d)' % num
-		print 'front// ', front
+		#print 'front// ', front
 		
 		self.cards.append(RawCard(front, back, 1))
 		
 	def addIgnores(self, indexes, length):
 		for i in indexes:
-			print len(self.paths[i]), length
+			#print len(self.paths[i]), length
 			if (len(self.paths[i]) == length):
-				print 'to be REMOVED ', self.paths[i]
+				#print 'to be REMOVED ', self.paths[i]
 				self.indexesToIgnore.append(i)
 		
 	def dumpPaths(self, indexes):
@@ -299,7 +296,7 @@ class NotesToCards():
 		nodeIndex = 0
 		for node in path:
 			if node.find('{{force}}') > -1:
-				print 'force FOUND in ', nodeIndex
+				#print 'force FOUND in ', nodeIndex
 				matchingIndexes = self.getMatchingSubset(path, nodeIndex)
 				self.removeForce(matchingIndexes, nodeIndex)
 				self.makeCardFromSubset(matchingIndexes, nodeIndex+1)
@@ -333,7 +330,7 @@ class NotesToCards():
 				
 	def makeCardFromPath(self, path):
 		
-		print '\ndoing path ', path
+		#print '\ndoing path ', path
 		# required to do this here to preserve order of cards
 		if not self.checkForForce(path):
 			return
@@ -364,23 +361,47 @@ class NotesToCards():
 		for i in range(len(self.paths)):
 			try:
 				self.indexesToIgnore.index(i)
-				print 'ignoring index ', i, self.paths[i]
+				#print 'ignoring index ', i, self.paths[i]
 			except:
 				self.makeCardFromPath(self.paths[i])
 				
+	def getImagePaths(self, zipfile):
+		imagePaths = []
+		for item in zipfile.namelist():
+			if item.startswith('Pictures/'): # will this work on windows?
+				imagePaths.append(item)
+		return imagePaths
+		
+	def addImagesToCollection(self, zipfile):
+		dest = mw.col.media.dir()
+		imagePaths = self.getImagePaths(zipfile)
+		for imagePath in imagePaths:
+			# Pictures/ 9
+			imageName = imagePath[9:]
+			imageContent = zipfile.read(imagePath)
+			f = open(os.path.join(dest, imageName), 'w')
+			f.write(imageContent, )
+			f.close()
+			#print 'moved image ', imageName
 		
 	def readContent(self, path):
 		if is_zipfile(path) == False:
 			return None
-				
+		
+		z = None
 		try:
 			z = ZipFile(path)
 			content = z.read('content.xml')
-			z.close()
+			
 		except:
-			print 'failed some zip operation'
+			print 'failed to open zip file or read \'content.xml\''
+			z.close()
 			return None
+			
+		if self.isAnkiPlugin:
+			self.addImagesToCollection(z)
 		
+		z.close()
 		return content
 		
 	def setTagNames(self, xml):
@@ -519,14 +540,40 @@ class NotesToCards():
 		self.setStyles(xml)
 		self.traverseTree(text)
 		self.makeCardsFromPaths()
-		self.dumpToFile('test.txt')
+		self.dumpToFile()
 		
-	def dumpToFile(self, path):
+	def dumpToFile(self):
+		path = self.filepath[0:-4] + '-READY_FOR_ANKI.txt'
 		f = open(path, 'w')
 		for c in self.cards:
 			f.write(c.asTabDelimited())
 		f.close()
 		
+	def runAsAnkiPlugin(self):
+		self.isAnkiPlugin = True
+		action = QAction("Convert Open Document Notes...", mw)
+		mw.connect(action, SIGNAL("triggered()"), self.actionConvertNotes)
+		mw.form.menuTools.addAction(action)
+		
+	def actionConvertNotes(self):
+		self.filepath = QFileDialog.getOpenFileName(mw, 'Choose File', 
+			mw.pm.base, "Open Document Files (*.odt)")
+		self.makeFromOdt(self.filepath)
+		#self.reportStatus()
+		self.reset()
+		
+	def reportStatus(self):
+		if self.status != None:
+			tooltip(self.status, 7000)
+		
 		
 app = NotesToCards()
-app.makeFromOdt(path)
+try:
+	from aqt import mw
+	from aqt.utils import showInfo, tooltip
+	from aqt.qt import *
+	app.runAsAnkiPlugin()
+except ImportError:
+	# not anki addon, must be run from command line
+	#app.makeFromOdt(path)
+	print 'no way to run from command line right now...'
