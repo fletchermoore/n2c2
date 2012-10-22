@@ -230,8 +230,6 @@ I have not tested any documents created by anything other than Libre Office on a
 not tested many use cases, so it may be possible to break the program. 
 Consider this an alpha release.
 
-Python librarys used include lxml, which is packaged with my OS, but perhaps not with yours.
-
 Poor integration with Anki (requiring 2 steps) is because I do not have time right now to learn how Anki's import
 code works and integrate my program well.
 
