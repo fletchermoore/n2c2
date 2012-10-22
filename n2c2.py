@@ -1,10 +1,29 @@
 from zipfile import ZipFile, is_zipfile
-from lxml import etree
-import re, os
+from xml.etree import ElementTree as etree
+import re, os, StringIO
 
 # how much jank?
 def rreplace(text, old, new, count):
 	return text[::-1].replace(old[::-1], new[::-1], count)[::-1]
+	
+# stolen from someone else on stackoverflow
+def parse_and_get_ns(file):
+  events = "start", "start-ns"
+  root = None
+  ns = {}
+  for event, elem in etree.iterparse(file, events):
+    if event == "start-ns":
+      if elem[0] in ns and ns[elem[0]] != elem[1]:
+        # NOTE: It is perfectly valid to have the same prefix refer
+        #   to different URI namespaces in different parts of the
+        #   document. This exception serves as a reminder that this
+        #   solution is not robust.  Use at your own peril.
+        raise KeyError("Duplicate prefix with different URI found.")
+      ns[elem[0]] = "%s" % elem[1]
+    elif event == "start":
+      if root is None:
+        root = elem
+  return etree.ElementTree(root), ns
 
 
 class RawCard():
@@ -217,6 +236,7 @@ class Style():
 class NotesToCards():
 	
 	def __init__(self):
+		self.isAnkiPlugin = False
 		self.reset()
 		
 	def reset(self):
@@ -380,7 +400,7 @@ class NotesToCards():
 			imageName = imagePath[9:]
 			imageContent = zipfile.read(imagePath)
 			f = open(os.path.join(dest, imageName), 'w')
-			f.write(imageContent, )
+			f.write(imageContent)
 			f.close()
 			#print 'moved image ', imageName
 		
@@ -531,9 +551,13 @@ class NotesToCards():
 		
 		# at this point assumptions are being made about
 		# the data
-		xml = etree.fromstring(content)
+		#xml = etree.fromstring(content)
+		
+		xml, ns = parse_and_get_ns(StringIO.StringIO(content))
+		xml.nsmap = ns
 		self.setTagNames(xml)
 		
+		print self.names['body']
 		body = xml.find(self.names['body'])
 		text = body.find(self.names['text'])
 		
@@ -543,7 +567,10 @@ class NotesToCards():
 		self.dumpToFile()
 		
 	def dumpToFile(self):
-		path = self.filepath[0:-4] + '-READY_FOR_ANKI.txt'
+		if self.isAnkiPlugin:
+			path = self.filepath[0:-4] + '-READY_FOR_ANKI.txt'
+		else:
+			path = 'test.txt' # needs fixing for command line implementation
 		f = open(path, 'w')
 		for c in self.cards:
 			f.write(c.asTabDelimited())
@@ -575,5 +602,5 @@ try:
 	app.runAsAnkiPlugin()
 except ImportError:
 	# not anki addon, must be run from command line
-	#app.makeFromOdt(path)
+	#app.makeFromOdt('test.odt')
 	print 'no way to run from command line right now...'
