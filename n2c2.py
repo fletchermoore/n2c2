@@ -1,5 +1,5 @@
 from zipfile import ZipFile, is_zipfile
-from xml.etree import ElementTree as etree
+from n2c2lib import ElementTree as etree
 import re, os, StringIO
 
 # how much jank?
@@ -557,7 +557,6 @@ class NotesToCards():
 		xml.nsmap = ns
 		self.setTagNames(xml)
 		
-		print self.names['body']
 		body = xml.find(self.names['body'])
 		text = body.find(self.names['text'])
 		
