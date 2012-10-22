@@ -1,7 +1,7 @@
 Installing
 ==========
 1. Get Anki at http://ankisrs.net
-2. Add the `n2c2.py` file and the 'n2c2lib' folder with its contents to the `Anki/addons` folder
+2. Add the `n2c2.py` file and the `n2c2lib` folder with its contents to the `Anki/addons` folder
 
 That's it.
 
