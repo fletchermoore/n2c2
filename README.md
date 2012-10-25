@@ -216,8 +216,8 @@ The program will convert bold, underline, italics, front color, and background c
 appropriate CSS and HTML codes. Anki will render these. Any other formatting will be ignored when the flash
 cards are created, but don't let that stop you from using it to decorate your notes!
 
-Images included in the `.odt` are added to you `collection.media` folder after you select 
-`Convert Open Document Notes...` whether you subsequently import the cards or not. The image must actually be
+Images included in the `.odt` are added to your `collection.media` folder after you select 
+`Import ODT...` whether you subsequently import the cards or not. The image must actually be
 anchored within the list itself or it will be ignored. This anchoring is not the default in Libre Office. You
 can change an image's anchoring state by right clicking it.
 
