@@ -1,11 +1,9 @@
-
+# Author: Fletcher Moore
+# this software is public domain.
 
 from zipfile import ZipFile, is_zipfile
 from n2c2lib import ElementTree as etree
 import re, os, StringIO
-### These imports are new
-from anki import notes
-from aqt import mw
 
 # how much jank?
 def rreplace(text, old, new, count):
@@ -86,7 +84,6 @@ class RawCard():
             # the collection:
             mw.col.addNote(new_note)
             
-         
 
 class TextBuilder():
 	def __init__(self, styles = [], names = {}):
@@ -131,6 +128,10 @@ class TextBuilder():
 			
 			if e.tag == self.names['line-break']:
 				self.add('<br/>')
+			
+			# google docs uses this heavily
+			if e.tag == self.names['s']:
+				self.add(' ', True)
 			
 			# not sure if this is a good idea
 			if e.tag == self.names['tab']:
@@ -488,6 +489,7 @@ class NotesToCards():
 		names['list'] = '{%s}list' % textns
 		names['list-item'] = '{%s}list-item' % textns
 		names['p'] = '{%s}p' % textns
+		names['s'] = '{%s}s' % textns
 		names['line-break'] = '{%s}line-break' % textns
 		names['tab'] = '{%s}tab' % textns
 		names['span'] = '{%s}span' % textns
@@ -635,14 +637,8 @@ class NotesToCards():
 	#  This is the only function I changed. Everywhere else I have written
         # new code leaving existing code unchanged 	
 	def runAsAnkiPlugin(self):
-		## Comment out old code:
-		#self.isAnkiPlugin = True
-		#action = QAction("Convert Open Document Notes...", mw)
-		#mw.connect(action, SIGNAL("triggered()"), self.actionConvertNotes)
-		#mw.form.menuTools.addAction(action)
-                ## New code:
 		self.isAnkiPlugin = True
-		action = QAction("Import ODT to Anki", mw)
+		action = QAction("Import ODT...", mw)
 		mw.connect(action, SIGNAL("triggered()"), self.actionImportFromOdt)
 		mw.form.menuTools.addAction(action)
 	
@@ -685,9 +681,8 @@ class NotesToCards():
 		
 app = NotesToCards()
 try:
-        ##  I had to move this import to the begining of the file
-        ## because I used it in RawCard.import_card
-	#from aqt import mw
+	from anki import notes
+	from aqt import mw
 	from aqt.utils import showInfo, tooltip
 	from aqt.qt import *
 	app.runAsAnkiPlugin()
