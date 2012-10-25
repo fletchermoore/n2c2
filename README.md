@@ -9,9 +9,8 @@ Use
 ===
 1. create your open document format text file. (ie, .odt)
 2. launch Anki
-3. within Anki, select `Tools -> Convert Open Document Notes...` and then choose your file.
-4. within Anki, select `File -> Import...` and then choose the newly created `-READY_FOR_ANKI.txt` file
-5. select or create the destination deck and then click `Import` (an oddly positioned button in the bottom right quadrant of the dialog box)
+3. within Anki, select `Tools -> Import ODT...` and then choose your file. _This action 
+immediately creates new cards within your current open deck without confirmation_
 
 Tutorial
 ========
@@ -229,8 +228,5 @@ Troubleshooting/Parting Words
 I have not tested any documents created by anything other than Libre Office on a Linux Mint machine. I have
 not tested many use cases, so it may be possible to break the program. 
 Consider this an alpha release.
-
-Poor integration with Anki (requiring 2 steps) is because I do not have time right now to learn how Anki's import
-code works and integrate my program well.
 
 glhf.
