@@ -226,8 +226,7 @@ Troubleshooting/Parting Words
 
 I have not tested many use cases, so it may be possible to break the program. Consider this an alpha release.
 
-Images within a google doc ODT are named 'image1', 'image2', etc. Images within an Libre Office ODT are named
-a large random number. This means images from multiple Google Docs will not import, since the file names will
-already exist. I am working on this issue.
+Importing the same file again will duplicate all of the cards and images. Checking for existence is on my todo list.
+For now you will need to manage that aspect yourself.
 
 glhf.
