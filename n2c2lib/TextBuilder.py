@@ -149,7 +149,7 @@ class TextBuilder():
 		# if the data matches, queue for overwite
 		# if the data is different, the file name is already in use
 		# in this case, create a novel filename
-		print self.destPath
+		#print self.destPath
 		return originalName
 		
 	def getStyleByName(self, name):

@@ -56,9 +56,11 @@ class NotesToCards():
 		self.styles = []
 		self.names = {}
 		self.builder = TextBuilder()
+		self.imageTracker = ImageTracker()
 		
 		if self.isAnkiPlugin:
-			self.builder.destPath = mw.col.media.dir()
+			self.imageTracker.destPath = mw.col.media.dir()
+			self.builder.destPath = mw.col.media.dir() # to be removed
 		
 
 	def discardDuplicates(self, theList):
@@ -197,24 +199,6 @@ class NotesToCards():
 			except:
 				self.makeCardFromPath(self.paths[i])
 				
-	def getImagePaths(self, zipfile):
-		imagePaths = []
-		for item in zipfile.namelist():
-			if item.startswith('Pictures/'): # will this work on windows?
-				imagePaths.append(item)
-		return imagePaths
-		
-	def addImagesToCollection(self, zipfile):
-		dest = mw.col.media.dir()
-		imagePaths = self.getImagePaths(zipfile)
-		for imagePath in imagePaths:
-			# Pictures/ 9
-			imageName = imagePath[9:]
-			imageContent = zipfile.read(imagePath)
-			f = open(os.path.join(dest, imageName), 'w')
-			f.write(imageContent)
-			f.close()
-			#print 'moved image ', imageName
 		
 	def readContent(self, path):
 		if is_zipfile(path) == False:
@@ -229,11 +213,11 @@ class NotesToCards():
 			print 'failed to open zip file or read \'content.xml\''
 			z.close()
 			return None
-			
-		if self.isAnkiPlugin:
-			self.addImagesToCollection(z)
 		
+		self.imageTracker.extractImages(z)
+		self.imageTracker.moveAll()
 		z.close()
+
 		return content
 		
 	def setTagNames(self, xml):
@@ -333,7 +317,6 @@ class NotesToCards():
 		else:
 			p = ps[0]
 			self.builder.parse(p)
-			print self.builder.mediaMap
 			return self.builder.formattedText
 			
 			
@@ -381,6 +364,9 @@ class NotesToCards():
 			self.import_to_anki()
 		else:
 			self.dumpToFile()
+		
+		#TODO: make this part of NotesToCards.reset()
+		self.imageTracker.cleanup()
 
 	def import_to_anki(self):
 		for c in self.cards:

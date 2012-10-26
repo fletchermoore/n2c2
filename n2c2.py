@@ -10,5 +10,5 @@ try:
 	app.runAsAnkiPlugin()
 except ImportError:
 	# not anki addon, run from command line
-	# app.makeFromOdt('gdocs.odt')
-	print 'no way to run from command line right now...'
+	app.makeFromOdt('gdocs.odt')
+	#print 'no way to run from command line right now...'
