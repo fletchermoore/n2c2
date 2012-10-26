@@ -55,8 +55,11 @@ class NotesToCards():
 		self.prevCard = RawCard('', '', 1)
 		self.styles = []
 		self.names = {}
-		self.builder = TextBuilder()
+		
+		# maybe make imageTracker TextBuilder only
 		self.imageTracker = ImageTracker()
+		self.builder = TextBuilder()
+		self.builder.imageTracker = self.imageTracker
 		
 		if self.isAnkiPlugin:
 			self.imageTracker.destPath = mw.col.media.dir()
@@ -215,7 +218,6 @@ class NotesToCards():
 			return None
 		
 		self.imageTracker.extractImages(z)
-		self.imageTracker.moveAll()
 		z.close()
 
 		return content

@@ -137,20 +137,11 @@ class TextBuilder():
 	def getImageHtml(self, frame):
 		if frame[0].tag == self.names['image']:
 			img = frame[0]
+			# get the href and remove the 'Pictures/' path
 			src = img.attrib[self.names['href']].split('/')[1]
-			self.mediaMap[src] = self.makeUniqueFileName(src)
-			html = "<img src=\"%s\"/>" % self.mediaMap[src]
+			html = "<img src=\"%s\"/>" % self.imageTracker.getName(src)
 			return html
 		return ''
-		
-	def makeUniqueFileName(self, originalName):
-		# check for the existance of the file
-		# if the file exists, check to see if the data matches
-		# if the data matches, queue for overwite
-		# if the data is different, the file name is already in use
-		# in this case, create a novel filename
-		#print self.destPath
-		return originalName
 		
 	def getStyleByName(self, name):
 		for s in self.styles:

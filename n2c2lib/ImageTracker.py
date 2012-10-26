@@ -7,18 +7,12 @@ import tempfile, shutil, os
 class ImageTracker():
 	def __init__(self, path='.'):
 		self.destPath = path
+	
+	def importImage(self, extractedName, writeName):
+		destFile = os.path.join(self.destPath, writeName)
+		srcFile = os.path.join(self.tempDir, extractedName)
 		
-	def moveAll(self):
-		for img in self.images:
-			destFile = os.path.join(self.destPath, img)
-			srcFile = os.path.join(self.tempDir, img)
-			
-			if os.path.exists(destFile):
-				print 'file', destFile, 'exists already'
-			else:
-				shutil.copy(srcFile, destFile)
-				print srcFile, 'moved to', destFile
-		
+		shutil.copy(srcFile, destFile)
 		
 	def createTmpDir(self):
 		self.tempDir = tempfile.mkdtemp(prefix='imgs_', dir='.')
@@ -38,7 +32,6 @@ class ImageTracker():
 			# 'Pictures/' len =9
 			imageName = imagePath[9:]
 			imageContent = zipfile.read(imagePath)
-			print 'extracting', imageName
 			f = open(os.path.join(self.tempDir, imageName), 'w')
 			f.write(imageContent)
 			f.close()
@@ -50,5 +43,31 @@ class ImageTracker():
 			if item.startswith('Pictures/'): # will this work on windows?
 				imagePaths.append(item)
 		return imagePaths
-            
+	
+	def compare(self, newImg, oldImg):
+		print 'comparing', self.getPath(newImg), 'to', oldImg
+		return True
+
+	# called by TextBuilder whenever an image link is encountered
+	# copys that image to destination and then
+	# returns the image name that was used
+	def getName(self, href):
+		writeName = self.makeUniqueFileName(href)
+		self.importImage(href, writeName)
+		return writeName
+	
+	# todo: maybe check for existence first
+	def getPath(self, imgName):
+		return os.path.join(self.tempDir, imgName)
+	
+	def makeUniqueFileName(self, originalName):
+		destFile = os.path.join(self.destPath, originalName)
+		if os.path.exists(destFile):
+			ext = os.path.splitext(destFile)[1] # if no extension?
+			fd, filepath = tempfile.mkstemp(ext, prefix='odt_img_', dir=self.destPath)
+			os.close(fd) # just using the name and overwriting later
+			filename = os.path.basename(filepath)
+			return filename
+		else:
+			return originalName
 
