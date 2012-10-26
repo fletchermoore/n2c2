@@ -216,8 +216,7 @@ The program will convert bold, underline, italics, front color, and background c
 appropriate CSS and HTML codes. Anki will render these. Any other formatting will be ignored when the flash
 cards are created, but don't let that stop you from using it to decorate your notes!
 
-Images included in the `.odt` are added to your `collection.media` folder after you select 
-`Import ODT...` whether you subsequently import the cards or not. The image must actually be
+Images included in the `.odt` are added to your `collection.media` folder. The image must actually be
 anchored within the list itself or it will be ignored. This anchoring is not the default in Libre Office. You
 can change an image's anchoring state by right clicking it.
 
@@ -225,8 +224,10 @@ can change an image's anchoring state by right clicking it.
 Troubleshooting/Parting Words
 =============================
 
-I have not tested any documents created by anything other than Libre Office on a Linux Mint machine. I have
-not tested many use cases, so it may be possible to break the program. 
-Consider this an alpha release.
+I have not tested many use cases, so it may be possible to break the program. Consider this an alpha release.
+
+Images within a google doc ODT are named 'image1', 'image2', etc. Images within an Libre Office ODT are named
+a large random number. This means images from multiple Google Docs will not import, since the file names will
+already exist. I am working on this issue.
 
 glhf.
