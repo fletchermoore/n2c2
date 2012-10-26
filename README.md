@@ -18,7 +18,7 @@ Tutorial
 Basics
 ------
 
-Flash cards will be constructed from the first list found in the document. All other text is ignored,
+Flash cards will be constructed only from the lists found in the document. All other text is ignored,
 so you can write whatever you want. The most nested leaves become the backs of your cards. 
 The front is the path down to the leaf separated by colons (`:`).
 
