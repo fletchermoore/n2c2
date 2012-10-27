@@ -340,14 +340,15 @@ class NotesToCards():
 			items = self.getListItems(l)
 			for e in items:
 				self.traverse([], e)
-		
+	
+	# returns number of cards created or None if no file is read.
 	def makeFromOdt(self, path):
 		self.reset()
 		
 		content = self.readContent(path)
 		if (content == None):
 			print 'No content was read.'
-			return
+			return None
 		
 		# at this point assumptions are being made about
 		# the data
@@ -369,6 +370,8 @@ class NotesToCards():
 		
 		#TODO: make this part of NotesToCards.reset()
 		self.imageTracker.cleanup()
+		
+		return len(self.cards)
 
 	def import_to_anki(self):
 		for c in self.cards:
@@ -394,7 +397,7 @@ class NotesToCards():
 	def actionImportFromOdt(self):
             self.filepath = QFileDialog.getOpenFileName(mw, 'Choose File', 
                     mw.pm.base, "Open Document Files (*.odt)")
-            self.makeFromOdt(self.filepath)
+            numCreated = self.makeFromOdt(self.filepath)
             self.reset()
             #  We must update the GUI so that the user knows that cards have
             # been added.  When the GUI is updated, the number of new cards
@@ -415,6 +418,10 @@ class NotesToCards():
                 mw.deckBrowser.refresh() # this shows the browser even if the
                   # main window is in state "resetRequired", which in my
                   # opinion is a good thing
+            
+            # alert the user
+            if numCreated != None:
+				tooltip('%d card(s) created.' % numCreated, 3000)
 		
 	def actionConvertNotes(self):
 		self.filepath = QFileDialog.getOpenFileName(mw, 'Choose File', 
