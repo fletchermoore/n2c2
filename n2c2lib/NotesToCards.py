@@ -8,16 +8,6 @@ from n2c2lib.TextBuilder import TextBuilder
 from n2c2lib.Style import Style
 import re, os, StringIO
 
-try:
-	#from anki import notes #unused?
-	from aqt import mw
-	from aqt.utils import showInfo, tooltip
-	from aqt.qt import *
-except ImportError:
-	# just keep going if imports not found
-	# is there a better way to do these imports?
-	pass
-
 
 # how much jank?
 def rreplace(text, old, new, count):
@@ -40,12 +30,14 @@ def parse_and_get_ns(file):
     elif event == "start":
       if root is None:
         root = elem
-  return etree.ElementTree(root), ns    
+  return etree.ElementTree(root), ns
+  
 
 class NotesToCards():
 	
 	def __init__(self):
 		self.isAnkiPlugin = False
+		self.destDir = '.'
 		self.reset()
 		
 	def reset(self):
@@ -58,12 +50,10 @@ class NotesToCards():
 		
 		# maybe make imageTracker TextBuilder only
 		self.imageTracker = ImageTracker()
+		self.imageTracker.destPath = self.destDir
 		self.builder = TextBuilder()
 		self.builder.imageTracker = self.imageTracker
-		
-		if self.isAnkiPlugin:
-			self.imageTracker.destPath = mw.col.media.dir()
-			self.builder.destPath = mw.col.media.dir() # to be removed
+		self.builder.destPath = self.destDir
 		
 
 	def discardDuplicates(self, theList):
@@ -363,73 +353,16 @@ class NotesToCards():
 		self.traverseTree(text)
 		self.makeCardsFromPaths()
 		
-		if self.isAnkiPlugin:
-			self.import_to_anki()
-		else:
-			self.dumpToFile()
-		
 		#TODO: make this part of NotesToCards.reset()
 		self.imageTracker.cleanup()
 		
 		return len(self.cards)
 
-	def import_to_anki(self):
-		for c in self.cards:
-			c.import_card()
+	
 		
 	def dumpToFile(self):
-		if self.isAnkiPlugin:
-			path = self.filepath[0:-4] + '-READY_FOR_ANKI.txt'
-		else:
-			path = 'test.txt' # needs fixing for command line implementation
+		path = 'test.txt' # needs fixing for command line implementation
 		f = open(path, 'w')
 		for c in self.cards:
 			f.write(c.asTabDelimited())
 		f.close()
-	
-	def runAsAnkiPlugin(self):
-		self.isAnkiPlugin = True
-		action = QAction("Import ODT...", mw)
-		mw.connect(action, SIGNAL("triggered()"), self.actionImportFromOdt)
-		mw.form.menuTools.addAction(action)
-	
-	# by Tiago
-	def actionImportFromOdt(self):
-            self.filepath = QFileDialog.getOpenFileName(mw, 'Choose File', 
-                    mw.pm.base, "Open Document Files (*.odt)")
-            numCreated = self.makeFromOdt(self.filepath)
-            self.reset()
-            #  We must update the GUI so that the user knows that cards have
-            # been added.  When the GUI is updated, the number of new cards
-            # changes, and it provides the feedback we want.
-            # If we want more feedback, we can add a tooltip that tells the
-            # user how many cards have been added.
-            # The way to update the GUI will depend on the state
-            # of the main window. There are four states (from what I understand):
-            #  - "review"
-            #  - "overview"
-            #  - "deckBrowser"
-            #  - "resetRequired" (we will treat this one like "deckBrowser)
-            if mw.state == "review":
-                mw.reviewer.show()
-            elif mw.state == "overview":
-                mw.overview.refresh()
-            else:
-                mw.deckBrowser.refresh() # this shows the browser even if the
-                  # main window is in state "resetRequired", which in my
-                  # opinion is a good thing
-            
-            # alert the user
-            if numCreated != None:
-				tooltip('%d card(s) created.' % numCreated, 3000)
-		
-	def actionConvertNotes(self):
-		self.filepath = QFileDialog.getOpenFileName(mw, 'Choose File', 
-			mw.pm.base, "Open Document Format Text Files (*.odt)")
-		self.makeFromOdt(self.filepath)
-		#self.reportStatus()
-		self.reset()
-		
-	def reportStatus(self):
-		if self.status != None:
-			tooltip(self.status, 7000)
