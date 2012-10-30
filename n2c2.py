@@ -121,6 +121,6 @@ except ImportError as err:
 	#print err.message
 	# not anki addon, run from command line
 	app = NotesToCards()
-	app.makeFromOdt('gdocs.odt')
+	app.makeFromOdt('test-numbering.odt')
 	app.dumpToFile()
 	

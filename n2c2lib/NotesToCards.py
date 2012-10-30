@@ -176,8 +176,10 @@ class NotesToCards():
 			card.front = subTup[0]
 			card.back = tmp
 		
+		print card.front, self.prevCard.front
 		if card.front == self.prevCard.front:
 			self.prevCard.num += 1
+			print self.prevCard.num
 			self.prevCard.back += '<br/>' + card.back
 		else:
 			self.cards.append(card)
@@ -191,6 +193,10 @@ class NotesToCards():
 				#print 'ignoring index ', i, self.paths[i]
 			except:
 				self.makeCardFromPath(self.paths[i])
+		
+		# adds the '(#)'to the end of cards if needed
+		for c in self.cards:
+			c.finalizeFront()
 				
 		
 	def readContent(self, path):
