@@ -48,8 +48,8 @@ will make 2 cards:
 
 (the `<br/>` tag will render in Anki as a line break)
 
-Special Characters: Asterisk (*)
---------------------------------
+Special Characters: "Force" * (the Asterisk)
+--------------------------------------------
 
 Notice that in the above example, the types sublist was collapsed into one card. 
 What would happen if the list looked like this instead?
@@ -87,8 +87,11 @@ You would end up with some hideous result like so:
 > front: `hypertension: types`
 > back: `maligant`
 
-No doubt, this is not what you want. To get around this, add the `*` to the end of the `types` bullet.
-This will force the code to produce a list of all the subelements.
+No doubt, this is not what you want. Normally the program checks to see if connsecutive terminal leaves have
+the same front. If they do, it collapses them into one card. In this case the leaves have been split apart by a
+quite different card. To get around this, add the `*` to the end of the `types` bullet.
+This symbol forces the program to make a card at this point, using only the immediate subitems. Here it will
+produce a list of all the subitems.
 
 <ul>
 <li> hypertension
@@ -119,6 +122,7 @@ Much better:
 > 
 > front: `hypertension: types: secondary`
 > back: `hypertension caused by some other underlying condition`
+
 
 Special Characters: "Start" ||
 ------------------------------
@@ -224,9 +228,12 @@ can change an image's anchoring state by right clicking it.
 Troubleshooting/Parting Words
 =============================
 
-I have not tested many use cases, so it may be possible to break the program. Consider this an alpha release.
+I have not tested many use cases, so it may be possible to break the program. Consider this an alpha release. If you
+can reproduce any erroneous behavior, please contact me via email.
 
 Importing the same file again will duplicate all of the cards and images. Checking for existence is on my todo list.
 For now you will need to manage that aspect yourself.
+
+
 
 glhf.
