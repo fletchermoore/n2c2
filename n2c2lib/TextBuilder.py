@@ -63,9 +63,30 @@ class TextBuilder():
 		if prefix:
 			self.addSpan(prefix)
 		
+		
 		self.makePlainText()
+		self.strip()
 		self.addCodes()
 		self.finalize()
+	
+	# same idea as the python string function, but with fragments
+	def strip(self):
+		# left side
+		startLen = len(self.plainText)
+		
+		finishLen = len(self.plainText.lstrip())
+		diff = startLen - finishLen
+		if diff > 0:
+			self.removeFirstChars(diff)
+		
+		# repeat for right side
+		finishLen = len(self.plainText.rstrip())
+		diff = startLen - finishLen
+		if diff > 0:
+			self.removeLastChars(diff)
+			
+		#rebuild plaintext
+		self.makePlainText()
 		
 	def makePlainText(self):
 		positions = self.getTextPositions()
@@ -92,7 +113,8 @@ class TextBuilder():
 			lengths.append(len(self.frags[i]))
 		return zip(positions, lengths)
 	
-	def removeFirstChars(self, num, positions):
+	def removeFirstChars(self, num):
+		positions = self.getTextPositions()
 		remainder = num
 		for i in positions:
 			fragLen = len(self.frags[i])
@@ -103,7 +125,8 @@ class TextBuilder():
 				self.frags[i] = self.frags[i][remainder:]
 				break
 				
-	def removeLastChars(self, num, positions):
+	def removeLastChars(self, num):
+		positions = self.getTextPositions()
 		remainder = num
 		for i in positions[::-1]:
 			fragLen = len(self.frags[i])
@@ -116,14 +139,12 @@ class TextBuilder():
 		
 	def replacePrefix(self, prefix, code):
 		if self.plainText.startswith(prefix):
-			positions = self.getTextPositions()
-			self.removeFirstChars(len(prefix), positions)
+			self.removeFirstChars(len(prefix))
 			self.add(code)
 		
 	def replacePostfix(self, postfix, code):
 		if self.plainText.endswith(postfix):
-			positions = self.getTextPositions()
-			self.removeLastChars(len(postfix), positions)
+			self.removeLastChars(len(postfix))
 			self.add(code)
 	
 	# remove 't's and join into one string
