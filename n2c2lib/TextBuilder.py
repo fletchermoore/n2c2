@@ -158,10 +158,14 @@ class TextBuilder():
 	def getImageHtml(self, frame):
 		if frame[0].tag == self.names['image']:
 			img = frame[0]
-			# get the href and remove the 'Pictures/' path
-			src = img.attrib[self.names['href']].split('/')[1]
-			html = "<img src=\"%s\"/>" % self.imageTracker.getName(src)
-			return html
+			# apparently it is possible for an empty image tag to exist <draw:image/>
+			try:
+				# get the href and remove the 'Pictures/' path
+				src = img.attrib[self.names['href']].split('/')[1]
+				html = "<img src=\"%s\"/>" % self.imageTracker.getName(src)
+				return html
+			except KeyError:
+				return '' # no error handling
 		return ''
 		
 	def getStyleByName(self, name):

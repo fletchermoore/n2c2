@@ -2,6 +2,7 @@
 # contributors: Tiago Barroso
 # this software is public domain.
 from n2c2lib.NotesToCards import NotesToCards
+import sys
 		
 	
 	
@@ -121,6 +122,6 @@ except ImportError as err:
 	#print err.message
 	# not anki addon, run from command line
 	app = NotesToCards()
-	app.makeFromOdt('test.odt')
+	app.makeFromOdt(sys.argv[1])
 	app.dumpToFile()
 	
