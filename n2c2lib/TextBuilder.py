@@ -1,3 +1,4 @@
+import constants
 
 class TextBuilder():
 	def __init__(self, styles = [], names = {}, path='.'):
@@ -43,7 +44,7 @@ class TextBuilder():
 					self.add(e.text, True)
 			
 			if e.tag == self.names['line-break']:
-				self.add('<br/>')
+				self.add(constants.htmlBr)
 			
 			# google docs uses this heavily
 			if e.tag == self.names['s']:

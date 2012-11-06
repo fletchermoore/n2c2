@@ -6,7 +6,7 @@ from n2c2lib.RawCard import RawCard
 from n2c2lib.ImageTracker import ImageTracker
 from n2c2lib.TextBuilder import TextBuilder 
 from n2c2lib.Style import Style
-import re, os, StringIO
+import re, os, StringIO, constants
 
 
 # how much jank?
@@ -93,7 +93,7 @@ class NotesToCards():
 				uniqueBacks.append(maybeBack)
 		
 		num = len(uniqueBacks)
-		back = '<br/>'.join(uniqueBacks)
+		back = constants.htmlBr.join(uniqueBacks)
 		back = re.sub(r'{{.+?}}', '', back)
 		#print 'back// ', back
 		
@@ -178,7 +178,7 @@ class NotesToCards():
 		
 		if card.front == self.prevCard.front:
 			self.prevCard.num += 1
-			self.prevCard.back += '<br/>' + card.back
+			self.prevCard.back += constants.htmlBr + card.back
 		else:
 			self.cards.append(card)
 			self.prevCard = card
