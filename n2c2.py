@@ -2,8 +2,7 @@
 # contributors: Tiago Barroso
 # this software is public domain.
 from n2c2lib.NotesToCards import NotesToCards
-from anki.utils import joinFields, stripHTML
-from aqt.utils import showText
+import n2c2lib.debug
 import sys
 		
 	
@@ -149,6 +148,8 @@ class AnkiN2C2Plugin():
 
 try:
 	# if Anki is found, we are an Anki addon
+	from anki.utils import joinFields, stripHTML
+	from aqt.utils import showText
 	from anki import notes
 	from aqt import mw
 	from aqt.utils import showInfo, tooltip
@@ -157,9 +158,19 @@ try:
 	plugin.setup()
 	
 except ImportError as err:
-	#print err.message
 	# not anki addon, run from command line
+	import argparse
+	parser = argparse.ArgumentParser()
+	parser.add_argument("file", help="An odt file to convert to flashcards")
+	parser.add_argument('-o', '--out', help="Filename to write to")
+	parser.add_argument('-d', '--debug', help="Dump debug output to stdout", action="store_true")
+	args = parser.parse_args()
+
+	if args.debug:
+		print "Debug on"
+	n2c2lib.debug.isDebug = args.debug
+
 	app = NotesToCards()
-	app.makeFromOdt(sys.argv[1])
-	app.dumpToFile()
+	app.makeFromOdt(args.file)
+	app.dumpToFile(args.out)
 	

@@ -1,4 +1,5 @@
 import constants
+from n2c2lib.debug import debug
 
 class TextBuilder():
 	def __init__(self, styles = [], names = {}, path='.'):
@@ -33,6 +34,7 @@ class TextBuilder():
 		self.reset()
 
 		for e in p.iter():
+			debug(e.text)
 			if e.text != None:
 				if e.tag == self.names['span']:
 					prefix = self.getSpan(e)
@@ -44,6 +46,7 @@ class TextBuilder():
 					self.add(e.text, True)
 			
 			if e.tag == self.names['line-break']:
+				debug('*the line break*')
 				self.add(constants.htmlBr)
 			
 			# google docs uses this heavily
@@ -58,6 +61,7 @@ class TextBuilder():
 				self.add(self.getImageHtml(e))
 			
 			if e.tail != None:
+				debug("*the tail %s" % e.tail)
 				self.add(e.tail, True)
 				
 		prefix = self.getSpan(p)
@@ -177,6 +181,7 @@ class TextBuilder():
 		
 	def getSpan(self, element):
 		if self.names['style-name'] in element.attrib:
+			debug(element.attrib)
 			style = self.getStyleByName(element.attrib[self.names['style-name']])
 			if style:
 				return "<span style=\"%s\">" % style.asCss()

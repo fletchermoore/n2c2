@@ -6,6 +6,7 @@ from n2c2lib.RawCard import RawCard
 from n2c2lib.ImageTracker import ImageTracker
 from n2c2lib.TextBuilder import TextBuilder 
 from n2c2lib.Style import Style
+from n2c2lib.debug import debug
 import re, os, StringIO, constants
 
 
@@ -364,7 +365,7 @@ class NotesToCards():
 
 	
 		
-	def dumpToFile(self):
+	def dumpToFile(self, out = 'test.txt'):
 		path = 'test.txt' # needs fixing for command line implementation
 		f = open(path, 'w')
 		for c in self.cards:
