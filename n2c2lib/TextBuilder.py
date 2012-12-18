@@ -28,20 +28,53 @@ class TextBuilder():
 		else:
 			self.frags.insert(0,prefix)
 			self.frags.append('</span>')
+	
+	# if inner span does not exist, we still remove the styles from the text
+	def addInnerSpan(self, innerSpan, outerSpan, text):
+		if innerSpan:
+			self.frags += ['</span>', innerSpan, 't', text, '</span>', outerSpan]
+		else:
+			self.frags += ['</span>', 't', text, outerSpan]
+			
+			
+	def getStyle(self, element):
+		if self.names['style-name'] in element.attrib:
+			style = self.getStyleByName(element.attrib[self.names['style-name']])
+			return style
+		return None
 			
 	
 	def parse(self, p):
 		self.reset()
-
+		paragraphStyle = self.getStyle(p)
+		debug("\nParsing paragraph with style: %s" % paragraphStyle.name)
+		debug(paragraphStyle.prettyPrint())
+		
 		for e in p.iter():
-			debug(e.text)
+			debug("Parsing element with text: %s" % e.text)
 			if e.text != None:
 				if e.tag == self.names['span']:
-					prefix = self.getSpan(e)
-					if prefix:
-						self.addSpan(prefix, e.text)
-					else:
+					spanStyle = self.getStyle(e)
+					debug("Span found: %s" % spanStyle.name)
+					debug(spanStyle.prettyPrint())
+					style = spanStyle.inherit(paragraphStyle)
+					debug("inherited %s" % style.prettyPrint())
+					isEqual = style.equals(paragraphStyle)
+					debug("paragraph equal span style? %s" % isEqual)
+					if isEqual:
 						self.add(e.text, True)
+					else:
+						openSpan = self.getOpenSpan(style)
+						# there is no paragraph style, but there is a span style
+						if paragraphStyle.isDefault():
+							if openSpan:
+								self.addSpan(openSpan, e.text)
+							else:
+								self.add(e.text, True)
+						else:
+							outerSpan = self.getOpenSpan(paragraphStyle)
+							debug("This should be the paragraph span: %s" % outerSpan)
+							self.addInnerSpan(openSpan, outerSpan, e.text)
 				else:
 					self.add(e.text, True)
 			
@@ -63,6 +96,8 @@ class TextBuilder():
 			if e.tail != None:
 				debug("*the tail %s" % e.tail)
 				self.add(e.tail, True)
+			
+			debug(self.frags)
 				
 		prefix = self.getSpan(p)
 		if prefix:
@@ -178,14 +213,17 @@ class TextBuilder():
 			if s.name == name:
 				return s
 		return False
+	
+	def getOpenSpan(self, style):
+		if style and not style.isDefault():
+			return "<span style=\"%s\">" % style.asCss()
+		else:
+			return None
 		
 	def getSpan(self, element):
 		if self.names['style-name'] in element.attrib:
-			debug(element.attrib)
 			style = self.getStyleByName(element.attrib[self.names['style-name']])
-			if style:
-				return "<span style=\"%s\">" % style.asCss()
-			
+			return self.getOpenSpan(style)		
 		return None
 		
 	def getHtmlFormat(self, span, text):

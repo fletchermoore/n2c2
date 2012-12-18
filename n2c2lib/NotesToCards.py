@@ -251,6 +251,7 @@ class NotesToCards():
 		
 		names['style'] = '{%s}style' % stylens
 		names['text-properties'] = '{%s}text-properties' % stylens
+		names['use-window-font-color']= '{%s}use-window-font-color' %stylens
 		self.names = names
 		self.builder.names = names
 		
@@ -265,17 +266,26 @@ class NotesToCards():
 				if self.names['font-weight'] in props.attrib:
 					if props.attrib[self.names['font-weight']] == 'bold':
 						s.bold = True
+					elif props.attrib[self.names['font-weight']] == 'normal':
+						s.resetBold = True						
 				
 				if self.names['text-underline-style'] in props.attrib:
 					if props.attrib[self.names['text-underline-style']] == 'solid':
 						s.underline = True
+					elif props.attrib[self.names['text-underline-style']] == 'none':
+						s.resetUnderline = True
 				
 				if self.names['font-style'] in props.attrib:
 					if props.attrib[self.names['font-style']] == 'italic':
 						s.italics = True
+					elif props.attrib[self.names['font-style']] == 'normal':
+						s.resetItalics = True
 						
 				if self.names['color'] in props.attrib:
 					s.color = props.attrib[self.names['color']]
+				elif self.names['use-window-font-color'] in props.attrib:
+					if props.attrib[self.names['use-window-font-color']] == 'true':
+						s.color = 'default'
 				
 				if self.names['background-color'] in props.attrib:
 					s.bgColor = props.attrib[self.names['background-color']]
@@ -283,8 +293,8 @@ class NotesToCards():
 				if self.names['font-size'] in props.attrib:
 					s.size = props.attrib[self.names['font-size']]
 			
-			if not s.isDefault():
-				self.styles.append(s)
+			#if not s.isDefault():
+			self.styles.append(s)
 		self.builder.styles = self.styles
 			
 					
