@@ -346,14 +346,13 @@ class NotesToCards():
 			for e in items:
 				self.traverse([], e)
 	
-	# returns number of cards created or None if no file is read.
-	def makeFromOdt(self, path):
+	def parseOdt(self, path):
 		self.reset()
 		
 		content = self.readContent(path)
 		if (content == None):
 			print 'No content was read.'
-			return None
+			return False
 		
 		# at this point assumptions are being made about
 		# the data
@@ -366,6 +365,14 @@ class NotesToCards():
 		
 		self.setStyles(xml)
 		self.traverseTree(text)
+		
+		return True
+		
+	# returns number of cards created or None if no file is read.
+	def makeFromOdt(self, path):
+		if not self.parseOdt(path):
+			return None
+		
 		self.makeCardsFromPaths()
 		
 		#TODO: make this part of NotesToCards.reset()
