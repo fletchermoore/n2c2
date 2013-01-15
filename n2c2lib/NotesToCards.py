@@ -7,7 +7,8 @@ from n2c2lib.ImageTracker import ImageTracker
 from n2c2lib.TextBuilder import TextBuilder 
 from n2c2lib.Style import Style
 from n2c2lib.debug import debug
-import re, os, StringIO, constants
+from n2c2lib.Node import Node
+import re, os, StringIO, constants, json
 
 
 # how much jank?
@@ -40,23 +41,41 @@ class NotesToCards():
 		self.isAnkiPlugin = False
 		self.destDir = '.'
 		self.reset()
-		
+	
 	def reset(self):
+		self.inputFile = None
+		self.outputFile = None
+		self.isJsonMode = False
+		self.isTextMode = False
 		self.paths = []
+		self.trees = []
 		self.indexesToIgnore = []
 		self.cards = []
 		self.prevCard = RawCard('', '', 1)
 		self.styles = []
 		self.names = {}
-		
 		# maybe make imageTracker TextBuilder only
 		self.imageTracker = ImageTracker()
 		self.imageTracker.destPath = self.destDir
 		self.builder = TextBuilder()
 		self.builder.imageTracker = self.imageTracker
-		self.builder.destPath = self.destDir
+		self.builder.destPath = self.destDir # is this necessary?
+	
+	# called once when app is created
+	def configure(self, args):
+		self.isJsonMode = args.json
+		self.isTextMode = args.text
+		self.inputFile = args.file
+		self.outputFile = args.out
+	
+	# called once after app is created
+	def execute(self):
+		if self.isJsonMode:
+			self.dumpJson()
+		else:
+			self.makeFromOdt(self.inputFile)
+			self.dumpToFile(self.outputFile)
 		
-
 	def discardDuplicates(self, theList):
 		uniqueItems = []
 		for item in theList:
@@ -154,7 +173,6 @@ class NotesToCards():
 			front = front[:len(front)-2]
 
 		return front
-		
 				
 	def makeCardFromPath(self, path):
 		
@@ -324,17 +342,24 @@ class NotesToCards():
 		else:
 			p = ps[0]
 			self.builder.parse(p)
-			return self.builder.formattedText
+			if self.isTextMode:
+				return self.builder.plainText
+			else:
+				return self.builder.formattedText
 			
 			
 	def traverse(self, path, element):
-		path.append(self.getText(element))
+		text = self.getText(element)
+		path.append(text)
+		node = Node(text)
 		
 		if not self.isLeaf(element):
 			for child in self.getListItems(self.getLists(element)[0]):
-				self.traverse(path[:], child) #shallow copy; gross, python
+				childNode = self.traverse(path[:], child)
+				node.children.append(childNode)
 		else:
 			self.paths.append(path)
+		return node
 			
 	def traverseTree(self, root):
 		lists = self.getLists(root)
@@ -344,11 +369,9 @@ class NotesToCards():
 		for l in lists:
 			items = self.getListItems(l)
 			for e in items:
-				self.traverse([], e)
+				self.trees.append(self.traverse([], e))
 	
-	def parseOdt(self, path):
-		self.reset()
-		
+	def makePathsFromFile(self, path):
 		content = self.readContent(path)
 		if (content == None):
 			print 'No content was read.'
@@ -364,24 +387,30 @@ class NotesToCards():
 		text = body.find(self.names['text'])
 		
 		self.setStyles(xml)
-		self.traverseTree(text)
-		
-		return True
-		
+		self.traverseTree(text)		
+	
 	# returns number of cards created or None if no file is read.
+	# do not like the name anymore...
 	def makeFromOdt(self, path):
-		if not self.parseOdt(path):
-			return None
+		self.reset()
 		
+		self.makePathsFromFile(path)
 		self.makeCardsFromPaths()
 		
-		#TODO: make this part of NotesToCards.reset()
+		#TODO: somehow consolidate this call and the call in dumpJson
 		self.imageTracker.cleanup()
 		
 		return len(self.cards)
 
-	
+	def dumpJson(self):
+		self.makePathsFromFile(self.inputFile)
+		trees = []
+		for node in self.trees:
+			trees.append(node.asJson())
+		print json.dumps(trees)
+		self.imageTracker.cleanup() # must be called to remove the temporary directory
 		
+				
 	def dumpToFile(self, out = 'test.txt'):
 		path = 'test.txt' # needs fixing for command line implementation
 		f = open(path, 'w')

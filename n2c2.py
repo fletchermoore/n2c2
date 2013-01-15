@@ -164,13 +164,15 @@ except ImportError as err:
 	parser.add_argument("file", help="An odt file to convert to flashcards")
 	parser.add_argument('-o', '--out', help="Filename to write to")
 	parser.add_argument('-d', '--debug', help="Dump debug output to stdout", action="store_true")
+	parser.add_argument('-j', '--json', help="Display contents as json in stdout", action="store_true")
+	parser.add_argument('-t', '--text', help="Ignore formatting", action="store_true")
 	args = parser.parse_args()
-
+	
 	if args.debug:
 		print "Debug on"
 	n2c2lib.debug.isDebug = args.debug
 
 	app = NotesToCards()
-	app.makeFromOdt(args.file)
-	app.dumpToFile(args.out)
+	app.configure(args)
+	app.execute()
 	

@@ -9,6 +9,7 @@ class TextBuilder():
 		self.reset()
 		
 	def reset(self):
+		self.isTextMode = False
 		self.frags = []
 		self.text = ''
 		self.plainText = ''
