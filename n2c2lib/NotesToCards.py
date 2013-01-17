@@ -392,7 +392,7 @@ class NotesToCards():
 	# returns number of cards created or None if no file is read.
 	# do not like the name anymore...
 	def makeFromOdt(self, path):
-		self.reset()
+		self.reset() #this would eliminate the initial configuration
 		
 		self.makePathsFromFile(path)
 		self.makeCardsFromPaths()
@@ -403,6 +403,7 @@ class NotesToCards():
 		return len(self.cards)
 
 	def dumpJson(self):
+		self.builder.isTextMode = self.isTextMode # configuration is getting terrible
 		self.makePathsFromFile(self.inputFile)
 		trees = []
 		for node in self.trees:

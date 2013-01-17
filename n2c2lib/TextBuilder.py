@@ -6,10 +6,10 @@ class TextBuilder():
 		self.styles = styles
 		self.names = names
 		self.destPath = path
+		self.isTextMode = False
 		self.reset()
 		
 	def reset(self):
-		self.isTextMode = False
 		self.frags = []
 		self.text = ''
 		self.plainText = ''
@@ -92,7 +92,11 @@ class TextBuilder():
 				self.add('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
 				
 			if e.tag == self.names['frame']:
-				self.add(self.getImageHtml(e))
+				debug("text mode @ img? %s" % self.isTextMode)
+				if self.isTextMode:
+					self.add("[img_removed]", True)
+				else:
+					self.add(self.getImageHtml(e))
 			
 			if e.tail != None:
 				debug("*the tail %s" % e.tail)
