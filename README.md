@@ -228,12 +228,14 @@ can change an image's anchoring state by right clicking it.
 Troubleshooting/Parting Words
 =============================
 
-I have not tested many use cases, so it may be possible to break the program. Consider this an alpha release. If you
-can reproduce any erroneous behavior, please contact me via email.
+I have been using it for a while with LibreOffice and it works well. Currently there is a rareish bug wherein the
+formatting will become screwed up. I have not gotten around to fixing it yet. I have not tested this in gdoc created
+documents lately, but it should work.
 
-Importing the same file again will duplicate all of the cards and images. Checking for existence is on my todo list.
+In LibreOffice, if you delete a bullet, but leave the text, this will cause the text to be ignored. I have not bothered
+to figure out why this is the case, but to avoid this problem use `<shift>+<enter>` to create linebreaks instead of
+deleting bullets.
+
+Importing the same file again will duplicate all of the cards and images. Checking for prior 
+existence is on my todo list.
 For now you will need to manage that aspect yourself.
-
-
-
-glhf.
