@@ -1,5 +1,6 @@
 import constants
 from n2c2lib.debug import debug
+from n2c2lib.Style import Style
 
 class TextBuilder():
 	def __init__(self, styles = [], names = {}, path='.'):
@@ -42,7 +43,7 @@ class TextBuilder():
 		if self.names['style-name'] in element.attrib:
 			style = self.getStyleByName(element.attrib[self.names['style-name']])
 			return style
-		return None
+		return Style() # it is possible for there to be no style given for a paragraph
 			
 	
 	def parse(self, p):
