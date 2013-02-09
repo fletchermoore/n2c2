@@ -103,7 +103,12 @@ class NotesToCards():
 		for i in indexes:
 			self.paths[i][depth] = self.paths[i][depth].replace('{{force}}', '')
 	
+	# called in checkForForce
 	def makeCardFromSubset(self, indexes, backIndex):
+		debug("makeCardFromSubset()")
+		debug(indexes)
+		debug("backIndex: %d" % backIndex)
+		
 		uniqueBacks = []
 		for i in indexes:
 			maybeBack = self.paths[i][backIndex]
@@ -143,19 +148,23 @@ class NotesToCards():
 		nodeIndex = 0
 		for node in path:
 			if node.find('{{force}}') > -1:
-				#print 'force FOUND in ', nodeIndex
+				debug("Force found in %d of path:" % nodeIndex)
+				debug(path)
 				matchingIndexes = self.getMatchingSubset(path, nodeIndex)
-				self.removeForce(matchingIndexes, nodeIndex)
-				self.makeCardFromSubset(matchingIndexes, nodeIndex+1)
-				self.addIgnores(matchingIndexes, nodeIndex+2)
-				# check to see if the current card was added to the ignore list
-				# if it was, do not continue with card creation
-				currentIndex = self.paths.index(path) # this should never fail
-				try:
-					self.indexesToIgnore.index(currentIndex)
-					return False # do not continue
-				except:
-					return True # not ignoring the index, so make the card
+				# if the '*' is used inappropriately, it is possible for matchingIndexes
+				# to return an empty list. check for it
+				if len(matchingIndexes) > 0:
+					self.removeForce(matchingIndexes, nodeIndex)
+					self.makeCardFromSubset(matchingIndexes, nodeIndex+1)
+					self.addIgnores(matchingIndexes, nodeIndex+2)
+					# check to see if the current card was added to the ignore list
+					# if it was, do not continue with card creation
+					currentIndex = self.paths.index(path) # this should never fail
+					try:
+						self.indexesToIgnore.index(currentIndex)
+						return False # do not continue
+					except:
+						return True # not ignoring the index, so make the card
 			nodeIndex += 1
 		return True
 		
@@ -201,9 +210,18 @@ class NotesToCards():
 		else:
 			self.cards.append(card)
 			self.prevCard = card
-			
-	
+
+	# prettier printing of paths
+	def debugPaths(self):
+		index = 0
+		for path in self.paths:
+			debug(index)
+			debug(path)
+			index += 1
+		
 	def makeCardsFromPaths(self):
+		debug("\n\nMaking cards from paths!\n========================")
+		self.debugPaths()
 		for i in range(len(self.paths)):
 			try:
 				self.indexesToIgnore.index(i)
