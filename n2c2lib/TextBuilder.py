@@ -6,7 +6,6 @@ class TextBuilder():
 	def __init__(self, styles = [], names = {}, path='.'):
 		self.styles = styles
 		self.names = names
-		self.destPath = path
 		self.isTextMode = False
 		self.reset()
 		

@@ -38,10 +38,10 @@ class AnkiN2C2Plugin():
 		mw.form.menuTools.addAction(action)
         
 	def actionImportFromOdt(self): # is the filepath used again in core?
-		self.core.destDir = mw.col.media.dir()
 		self.core.filepath = QFileDialog.getOpenFileName(mw, 'Choose File', 
 		        mw.pm.base, "Open Document Files (*.odt)")
-		self.numCreated = self.core.makeFromOdt(self.core.filepath)
+		self.numCreated = self.core.makeFromOdt(self.core.filepath,
+											mw.col.media.dir())
 		cards = self.core.cards
 		self.import_to_anki(cards)
 		self.core.reset()
