@@ -213,6 +213,12 @@ A word of caution: some word processors will replace the double angle brackets w
 happens the "reverse" code will not be interpreted. Also, if you have subitems under a reversed card, the card will
 not reverse correctly. The reversed bullet must be a terminal leaf.
 
+Advanced Use Cases
+------------------
+
+You can find additional formatting tricks in the Wiki on Github.
+
+
 Text Formatting and Images
 --------------------------
 
