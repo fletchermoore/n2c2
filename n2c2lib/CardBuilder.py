@@ -125,6 +125,7 @@ class CardBuilder():
         
         card.num = 1
         
+        # switch the front and back of the card
         subTup = re.subn('{{reverse}}', '', card.back, 1)
         if subTup[1] > 0:
             tmp = card.front
@@ -132,29 +133,46 @@ class CardBuilder():
             card.back = tmp
         
         if card.front == self.prevCard.front:
-            self.prevCard.num += 1
+            if card.back != '' and card.back[0:5] != '<img ':
+                self.prevCard.num += 1
             self.prevCard.back += constants.htmlBr + card.back
         else:
             self.cards.append(card)
             self.prevCard = card
 
+    # if you have a list [a, b><, c, d]
+    # create the list [c, d, a, b]
+    # What good is this? Suppose you want to make a bunch of
+    # cards with the same prompt. Without this function, you have to
+    # type the prompt over and over. With swap you can just put it at
+    # the top of your list
+    # I cannot really come up with use cases for more than one swap
+    # but now it can be done. 
+    # maybe it would be more intuitive in reverse?
+    def doSwaps(self, path):
+        for i in range(0, len(path)):
+            if path[i].find('{{swap}}') > -1:
+                path[i] = path[i].replace('{{swap}}', '')
+                firstPart = path[0:i+1]
+                secondPart = path[i+1:]
+                secondPart.extend(firstPart)
+                return self.doSwaps(secondPart)
+        return path
 
     def makeFront(self, path):
+        path = self.doSwaps(path)
+        
         nodes = []
         delimiter = ': '
         front = ''
-        
+            
         # build the new list in reverse order to presentation
         for node in path[::-1]: # moves through paths in reverse order
             if node.find('{{nodelimiter}}') > -1:
                 node = node.replace('{{nodelimiter}}', '')
                 nodes.append(' ') # no delimiter isn't literally true :)
                 nodes.append(node)
-            elif node.find('{{swap}}') > -1: # for the moment, just remove the tag
-                node = node.replace('{{swap}}', '')
-                nodes.append(delimiter)
-                nodes.append(node)
-            elif node.find('{{start}}') > -1:
+            elif node.find('{{start}}') > -1: #reached start point -> terminate
                 node = node.replace('{{start}}', '')
                 nodes.append(delimiter)
                 nodes.append(node)
