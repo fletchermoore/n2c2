@@ -44,7 +44,6 @@ class AnkiN2C2Plugin():
 											mw.col.media.dir())
 		cards = self.core.cards
 		self.import_to_anki(cards)
-		self.core.reset()
 		#  We must update the GUI so that the user knows that cards have
 		# been added.  When the GUI is updated, the number of new cards
 		# changes, and it provides the feedback we want.

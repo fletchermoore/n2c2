@@ -144,6 +144,8 @@ class TextBuilder():
 		self.replacePrefix('<<', '{{reverse}}')
 		self.replacePrefix('||', '{{start}}')
 		self.replacePostfix('*', '{{force}}')
+		self.replacePostfix('\\', '{{nodelimiter}}')
+		self.replacePostfix('><', '{{swap}}')
 		
 	def getTextPositions(self):
 		positions = []

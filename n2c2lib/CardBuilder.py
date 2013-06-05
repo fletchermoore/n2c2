@@ -110,15 +110,17 @@ class CardBuilder():
         return True
     
     def makeCardFromPath(self, path):
-        #print '\ndoing path ', path
+        # make sure there are enough nodes in path to make a card
+        if len(path) < 2:
+            return
+                
         # required to do this here to preserve order of cards
         if not self.checkForForce(path):
             return
 
         card = RawCard()
         card.back = path.pop()
-        
-        # remove nodes prior to {{start}}
+                
         card.front = self.makeFront(path)
         
         card.num = 1
@@ -138,19 +140,32 @@ class CardBuilder():
 
 
     def makeFront(self, path):
+        nodes = []
+        delimiter = ': '
         front = ''
-        for node in path[::-1]:
-            if node.find('{{start}}') > -1:
+        
+        # build the new list in reverse order to presentation
+        for node in path[::-1]: # moves through paths in reverse order
+            if node.find('{{nodelimiter}}') > -1:
+                node = node.replace('{{nodelimiter}}', '')
+                nodes.append(' ') # no delimiter isn't literally true :)
+                nodes.append(node)
+            elif node.find('{{swap}}') > -1: # for the moment, just remove the tag
+                node = node.replace('{{swap}}', '')
+                nodes.append(delimiter)
+                nodes.append(node)
+            elif node.find('{{start}}') > -1:
                 node = node.replace('{{start}}', '')
-                front = node + ': ' + front
+                nodes.append(delimiter)
+                nodes.append(node)
                 break
             else:
-                front = node + ': ' + front
+                nodes.append(delimiter)
+                nodes.append(node)
                 
-        if front.endswith(': '):
-            front = front[:len(front)-2]
-
-        return front
+        nodes.reverse()
+        nodes.pop()
+        return ''.join(nodes)
 
     # prettier printing of paths
     def debugPaths(self):

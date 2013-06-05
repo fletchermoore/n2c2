@@ -10,17 +10,8 @@ from n2c2lib.debug import debug
 import re, os, constants, json
 
 
-# how much jank?
-def rreplace(text, old, new, count):
-	return text[::-1].replace(old[::-1], new[::-1], count)[::-1]
-	
-
 class NotesToCards():
 	
-	def __init__(self):
-		self.isAnkiPlugin = False
-		
-
 	# called once when app is created
 	def configure(self, args):
 		self.isJsonMode = args.json
@@ -34,30 +25,11 @@ class NotesToCards():
 			print 'this feature is currently unavailable'
 			#self.dumpJson()
 		else:
-			self.makeFromOdt(self.inputFile)
+			self.makeFromOdt(self.inputFile, '.')
 			self.dumpToFile(self.outputFile)
 		
-	def discardDuplicates(self, theList):
-		uniqueItems = []
-		for item in theList:
-			try:
-				uniqueItems.index(item)
-			except:
-				uniqueItems.append(item)
-		return uniqueItems
-	
-	def dumpPaths(self, indexes):
-		for i in indexes:
-			print '\t', self.paths[i]			
-	
 		
-	def makeCardsFromPaths(self):
-		cardBuilder = CardBuilder()
-		self.cards = cardBuilder.build(self.paths)		
-		
-	
-	# returns number of cards created or None if no file is read.
-	# called by anki plugin
+	# called by anki plugin, command line
 	# todo: eliminate mediaPath by fixing imageTracker
 	def makeFromOdt(self, filePath, mediaPath):
 		odt = OdtModel(filePath, mediaPath)
@@ -67,15 +39,6 @@ class NotesToCards():
 		self.cards = cardBuilder.build(self.paths)
 		
 		return len(self.cards)
-
-	def dumpJson(self):
-		self.builder.isTextMode = self.isTextMode # configuration is getting terrible
-		self.makePathsFromFile(self.inputFile)
-		trees = []
-		for node in self.trees:
-			trees.append(node.asJson())
-		print json.dumps(trees)
-		self.imageTracker.cleanup() # must be called to remove the temporary directory
 		
 				
 	def dumpToFile(self, out = 'test.txt'):
