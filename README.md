@@ -1,3 +1,6 @@
+This project is no longer maintained. It does not work with Anki2.1.
+
+
 Installing
 ==========
 1. Get Anki at http://ankisrs.net
